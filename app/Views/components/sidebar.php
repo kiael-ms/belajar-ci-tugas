@@ -28,6 +28,46 @@
         }
         ?> 
         </li><!-- End Produk Nav -->
+        
+        <!-- Start Discount Nav -->
+        <?php
+        if (session()->get('role') == 'admin') {
+        ?>
+        <li class="nav-item">
+            <a class="nav-link <?= (uri_string() == 'diskon') ? "" : "collapsed" ?>" href="<?= base_url('diskon') ?>">
+                <i class="bi bi-percent"></i>
+                <span>Diskon</span>
+            </a>
+        </li>
+        <?php
+        }
+        ?>
+        <!-- End Discount Nav -->
+
+        <!-- Start pembalian Nav -->
+        <?php
+        if(session()->get('role')=='admin'){
+        ?>
+
+        <li class="nav-item">
+
+        <a class="nav-link <?= uri_string()=='pembelian' ? '' : 'collapsed' ?>"
+
+        href="<?= base_url('pembelian')?>">
+
+        <i class="bi bi-bag-check"></i>
+
+        <span>Pembelian</span>
+
+        </a>
+
+        </li>
+
+        <?php
+        }
+        ?>
+        <!-- End pembelian Nav -->
+
 
         <li class="nav-item">
         <a class="nav-link <?php echo (uri_string() == 'history') ? "" : "collapsed" ?>" href="history">

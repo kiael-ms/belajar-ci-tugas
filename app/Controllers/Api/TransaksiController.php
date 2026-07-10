@@ -8,6 +8,7 @@ use CodeIgniter\HTTP\ResponseInterface;
 use App\Models\TransactionModel;
 use App\Models\TransactionDetailModel;
 
+
 class TransaksiController extends BaseController
 {
     protected $transactionModel;

@@ -9,26 +9,32 @@ use App\Services\RajaOngkirService;
 use App\Models\TransactionModel;
 use App\Models\TransactionDetailModel;
 
+use App\Models\DiscountModel;
+
 class TransaksiController extends BaseController
 {
     protected $cart;
     protected $transactionModel;
     protected $transactionDetailModel;
+    protected $discountModel;
 
     public function __construct()
     {
         helper(['number', 'form']);
         $this->cart = service('cart');
         $this->transactionModel = new TransactionModel();
-        $this->transactionDetailModel = new TransactionDetailModel(); 
+        $this->transactionDetailModel = new TransactionDetailModel();
+        $this->discountModel = new DiscountModel(); 
     }
 
     public function index()
     {  
+        $discount = $this->discountModel->getTodayDiscount();
+
         $data = [
             'items' => $this->cart->contents(),
-            'total' => $this->cart->total()
-        ];
+            'total' => $this->cart->total(),
+            'discount' => $discount];
 
         return view('v_keranjang', $data);
     }
@@ -100,9 +106,12 @@ class TransaksiController extends BaseController
 
     public function checkout()
     {  
+        $discount = $this->discountModel->getTodayDiscount();
+
         $data = [
             'items' => $this->cart->contents(),
-            'total' => $this->cart->total() 
+            'total' => $this->cart->total(),
+            'discount' => $discount
         ];
 
         return view('v_checkout', $data);
@@ -172,9 +181,17 @@ class TransaksiController extends BaseController
         $db = \Config\Database::connect();
         $db->transStart(); 
 
+        $discount = $this->discountModel->getTodayDiscount();
+
+        $nominalDiskon = $discount['nominal'] ?? 0;
+
         $subtotal = 0;
+
         foreach ($cartItems as $item) {
-            $subtotal += $item['qty'] * $item['price'];
+
+            $harga = max(0, $item['price'] - $nominalDiskon);
+
+            $subtotal += $harga * $item['qty'];
         }
 
         $ongkir = (int) $this->request->getPost('ongkir');
@@ -197,12 +214,14 @@ class TransaksiController extends BaseController
 
         // insert transaction detail
         foreach ($cartItems as $item) {
+            $harga = max(0, $item['price'] - $nominalDiskon);
+
             $this->transactionDetailModel->insert([
                 'transaction_id' => $transactionId,
                 'product_id'     => $item['id'],
                 'jumlah'         => $item['qty'],
-                'diskon'         => 0,
-                'subtotal_harga' => $item['qty'] * $item['price'] 
+                'diskon'         => $nominalDiskon,
+                'subtotal_harga' => $harga * $item['qty']
             ]);
         }
 

@@ -74,8 +74,22 @@ if(uri_string()!=""){
 
           <div class="card">
             <div class="card-body">
-              <h5 class="card-title"><?php echo $hlm?></h5>
+              <h5 class="card-title"><?= $hlm ?></h5>
+              <?php if(isset($discount) && $discount): ?>
+                <div class="alert alert-success">
+
+                  <strong>
+                      Hari ini ada diskon
+                      <?= number_to_currency($discount['nominal'],'IDR') ?>
+                      per item
+                  </strong>
+
+                </div>
+
+              <?php endif; ?>
+
               <?= $this->renderSection('content') ?>
+
             </div>
           </div>
 

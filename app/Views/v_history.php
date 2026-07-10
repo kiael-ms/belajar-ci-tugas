@@ -73,10 +73,56 @@ History Transaksi Pembelian <strong><?= $username ?></strong>
                                 <?php endif; ?>
 
                                 <strong><?= $item2['nama'] ?></strong>
-                                <?= number_to_currency($item2['harga'], 'IDR') ?>
+
                                 <br>
-                                <?= "(" . $item2['jumlah'] . " pcs)" ?><br>
-                                <?= number_to_currency($item2['subtotal_harga'], 'IDR') ?>
+
+                                <?php
+
+                                $hargaAsli = $item2['harga'];
+
+                                $hargaDiskon = max(0, $hargaAsli - $item2['diskon']);
+
+                                ?>
+
+                                <?php if($item2['diskon'] > 0): ?>
+
+                                    <small class="text-danger">
+
+                                        <del>
+
+                                            <?= number_to_currency($hargaAsli,'IDR') ?>
+
+                                        </del>
+
+                                    </small>
+
+                                    <br>
+
+                                    <strong>
+
+                                        <?= number_to_currency($hargaDiskon,'IDR') ?>
+
+                                    </strong>
+
+                                <?php else: ?>
+
+                                    <?= number_to_currency($hargaAsli,'IDR') ?>
+
+                                <?php endif; ?>
+
+                                <br>
+
+                                <?= $item2['jumlah'] ?> pcs
+
+                                <br>
+
+                                Subtotal :
+
+                                <strong>
+
+                                <?= number_to_currency($item2['subtotal_harga'],'IDR') ?>
+
+                                </strong>
                                 <hr>
                             <?php endforeach; ?>
                         <?php endif; ?>

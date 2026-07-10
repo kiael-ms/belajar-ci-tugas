@@ -26,28 +26,110 @@ if (session()->getFlashData('success')) {
     <tbody>
         <?php
         $i = 1;
+
         if (!empty($items)) :
             foreach ($items as $index => $item) :
+
+                $hargaAsli = $item['price'];
+
+                $nominalDiskon = $discount['nominal'] ?? 0;
+
+                $hargaFinal = max(0, $hargaAsli - $nominalDiskon);
+
+                $subtotal = $hargaFinal * $item['qty'];
         ?>
-                <tr>
-                    <td><?= $item['name'] ?></td>
-                    <td><img src="<?= base_url() . "img/" . $item['options']['foto'] ?>" width="100px"></td>
-                    <td><?= number_to_currency($item['price'], 'IDR') ?></td> 
-                    <td><input type="number" min="1" name="qty<?= $i++ ?>" class="form-control" value="<?= $item['qty'] ?>"></td>
-                    <td><?= number_to_currency($item['subtotal'], 'IDR') ?></td>
-                    <td>
-                        <a href="<?= base_url('keranjang/delete/' . $item['rowid'] . '') ?>" class="btn btn-danger"><i class="bi bi-trash"></i></a>
-                    </td>
-                </tr>
+
+        <tr>
+
+            <td><?= $item['name'] ?></td>
+
+            <td>
+                <img src="<?= base_url() . "img/" . $item['options']['foto'] ?>" width="100">
+            </td>
+
+            <td>
+
+            <?php if($discount): ?>
+
+            <small class="text-danger">
+                <del><?= number_to_currency($hargaAsli,'IDR') ?></del>
+            </small>
+
+            <br>
+
+            <strong>
+                <?= number_to_currency($hargaFinal,'IDR') ?>
+            </strong>
+
+            <?php else: ?>
+
+            <?= number_to_currency($hargaAsli,'IDR') ?>
+
+            <?php endif; ?>
+
+            </td>
+
+            <td>
+
+                <input
+                    type="number"
+                    min="1"
+                    name="qty<?= $i++ ?>"
+                    class="form-control"
+                    value="<?= $item['qty'] ?>">
+
+            </td>
+
+            <td>
+
+                <?= number_to_currency($subtotal,'IDR') ?>
+
+            </td>
+
+            <td>
+
+                <a href="<?= base_url('keranjang/delete/'.$item['rowid']) ?>"
+                class="btn btn-danger">
+
+                    <i class="bi bi-trash"></i>
+
+                </a>
+
+            </td>
+
+        </tr>
+
         <?php
             endforeach;
         endif;
         ?>
+
     </tbody>
 </table> 
 
+<?php
+
+$totalDiskon = 0;
+
+foreach($items as $item){
+
+    $harga = $item['price'];
+
+    $harga -= $discount['nominal'] ?? 0;
+
+    if($harga < 0){
+        $harga = 0;
+    }
+
+    $totalDiskon += $harga * $item['qty'];
+}
+
+?>
+
 <div class="alert alert-info">
-    <?= "Total = " . number_to_currency($total, 'IDR') ?>
+
+    Total = <?= number_to_currency($totalDiskon,'IDR') ?>
+
 </div>
 
 <button type="submit" class="btn btn-primary">Perbarui Keranjang</button>

@@ -15,16 +15,34 @@ if (session()->getFlashData('success')) {
     <?php foreach ($products as $key => $item) : ?>         
             <div class="col-lg-6">
                 <?= form_open('keranjang') ?>
+                <?php
+
+                $hargaAsli = $item['harga'];
+                $hargaFinal = $hargaAsli;
+
+                if ($discount) {
+
+                    $hargaFinal = $hargaAsli - $discount['nominal'];
+
+                    if ($hargaFinal < 0) {
+                        $hargaFinal = 0;
+                    }
+
+                }
+
+                ?>
+
                 <?= form_hidden([
-                    'id'    => $item['id'],
+                    'id'    => (string) $item['id'],
                     'nama'  => $item['nama'],
-                    'harga' => $item['harga'],
-                    'foto'  => $item['foto']]) ?>
+                    'harga' => (string) $hargaAsli,
+                    'foto'  => $item['foto']
+                ]) ?>
 
                 <div class="card">
                     <div class="card-body">
                         <img src="<?= base_url() . "img/" . $item['foto'] ?>" alt="..." width="50%">
-                        <h5 class="card-title"><?= $item['nama'] ?><br><?= number_to_currency($item['harga'], 'IDR') ?></h5>
+                        <h5 class="card-title"><?= $item['nama'] ?><br><?php if($discount): ?><del class="text-danger"><?= number_to_currency($hargaAsli,'IDR') ?></del><br><?= number_to_currency($hargaFinal,'IDR') ?><?php else: ?><?= number_to_currency($hargaAsli,'IDR') ?><?php endif; ?></h5>
                         <button type="submit" class="btn btn-info rounded-pill">Beli</button>
                     </div>
                 </div>
